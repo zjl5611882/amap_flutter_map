@@ -5,6 +5,7 @@
 //  Created by lly on 2020/11/5.
 //
 
+
 #import "MAAnnotationView+Flutter.h"
 #import "AMapMarker.h"
 #import "AMapInfoWindow.h"
@@ -36,5 +37,4 @@
     self.hidden = (!marker.visible);
     self.zIndex = marker.zIndex;
 }
-
 @end

@@ -159,7 +159,7 @@ class _MapState extends State<AMapWidget> {
       'apiKey': widget.apiKey?.toMap(),
       'initialCameraPosition': widget.initialCameraPosition.toMap(),
       'options': _mapOptions.toMap(),
-      'markersToAdd': serializeOverlaySet(widget.markers),
+      'f': serializeOverlaySet(widget.markers),
       'polylinesToAdd': serializeOverlaySet(widget.polylines),
       'polygonsToAdd': serializeOverlaySet(widget.polygons),
     };

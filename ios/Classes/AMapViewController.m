@@ -27,6 +27,9 @@
 #import "AMapConvertUtil.h"
 #import "FlutterMethodChannel+MethodCallDispatch.h"
 
+#import "MAInfowindowView.h"
+#import "AMapInfoWindow.h"
+#import "AMapMarker.h"
 @interface AMapViewController ()<MAMapViewDelegate>
 
 @property (nonatomic,strong) MAMapView *mapView;
@@ -316,7 +319,6 @@
 }
 
 //MARK: Annotation相关回调
-
 - (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation {
     if ([annotation isKindOfClass:[MAPointAnnotation class]] == NO) {
         return nil;
@@ -326,13 +328,29 @@
         return nil;
     }
     AMapMarker *marker = [_markerController markerForId:fAnno.markerId];
+    
+    ///flutter 自定义--->
+   static NSString *poiIdentifier = @"poiIdentifier";
+   MAInfowindowView *poiAnnotationView = (MAInfowindowView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:poiIdentifier];
+   if (poiAnnotationView == nil)
+   {
+       poiAnnotationView = [[MAInfowindowView alloc] initWithAnnotation:annotation reuseIdentifier:poiIdentifier];
+
+       // 屏蔽默认的calloutView
+       poiAnnotationView.canShowCallout = NO;
+   }
+   poiAnnotationView.marker = marker;
+   return poiAnnotationView;
+    ///<---flutter 自定义
+    
+
     //    TODO: 这里只实现基础AnnotationView，不再根据marker的数据差异，区分是annotationView还是pinAnnotationView了；
-    MAAnnotationView *view = [mapView dequeueReusableAnnotationViewWithIdentifier:AMapFlutterAnnotationViewIdentifier];
-    if (view == nil) {
-        view = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:AMapFlutterAnnotationViewIdentifier];
-    }
-    [view updateViewWithMarker:marker];
-    return view;
+//     MAAnnotationView *view = [mapView dequeueReusableAnnotationViewWithIdentifier:AMapFlutterAnnotationViewIdentifier];
+//     if (view == nil) {
+//         view = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:AMapFlutterAnnotationViewIdentifier];
+//     }
+//     [view updateViewWithMarker:marker];
+//     return view;
 }
 
 /**
@@ -341,7 +359,12 @@
  * @param views 新添加的annotation views
  */
 - (void)mapView:(MAMapView *)mapView didAddAnnotationViews:(NSArray *)views {
+     NSLog(@"views ============ %@",views);
+    
+    
     for (MAAnnotationView *view in views) {
+        
+        
         if ([view.annotation isKindOfClass:[MAAnnotationView class]] == NO) {
             return;
         }
@@ -352,6 +375,7 @@
         AMapMarker *marker = [_markerController markerForId:fAnno.markerId];
         [view updateViewWithMarker:marker];
     }
+    
 }
 
 

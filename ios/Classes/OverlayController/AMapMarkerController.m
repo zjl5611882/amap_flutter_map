@@ -58,6 +58,7 @@
 }
 
 - (void)addMarkers:(NSArray*)markersToAdd {
+    NSMutableArray *markers = [NSMutableArray array];
     for (NSDictionary* marker in markersToAdd) {
         AMapMarker *markerModel = [AMapJsonUtils modelFromDict:marker modelClass:[AMapMarker class]];
         //从bitmapDesc中解析UIImage
@@ -68,7 +69,13 @@
         if (markerModel.id_) {
             _markerDict[markerModel.id_] = markerModel;
         }
-        [self.mapView addAnnotation:markerModel.annotation];
+        [markers addObject:markerModel.annotation];
+    }
+    if (markers.count>0) {
+        [self.mapView addAnnotations:markers];
+        ///显示全部地图上的点---flutter需求
+        NSLog(@"markersmarkers == %@",markers);
+       [self.mapView showAnnotations:markers edgePadding:UIEdgeInsetsMake(50, 50, 50, 50) animated:YES];
     }
 }
 

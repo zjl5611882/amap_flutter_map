@@ -1,25 +1,38 @@
 package com.amap.flutter.map.overlays.marker;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureMapView;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.Poi;
 import com.amap.api.maps.model.Polyline;
+import com.amap.flutter.amap_flutter_map.R;
 import com.amap.flutter.map.MyMethodCallHandler;
 import com.amap.flutter.map.overlays.AbstractOverlayController;
 import com.amap.flutter.map.utils.Const;
 import com.amap.flutter.map.utils.ConvertUtil;
 import com.amap.flutter.map.utils.LogUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -39,9 +52,11 @@ public class MarkersController
         AMap.OnPOIClickListener {
     private static final String CLASS_NAME = "MarkersController";
     private String selectedMarkerDartId;
+    private Context mContext;
 
-    public MarkersController(MethodChannel methodChannel, AMap amap) {
+    public MarkersController(MethodChannel methodChannel, AMap amap, Context context) {
         super(methodChannel, amap);
+        this.mContext=context;
         amap.addOnMarkerClickListener(this);
         amap.addOnMarkerDragListener(this);
         amap.addOnMapClickListener(this);
@@ -64,7 +79,6 @@ public class MarkersController
         }
     }
 
-
     /**
      * 执行主动方法更新marker
      *
@@ -76,7 +90,8 @@ public class MarkersController
             return;
         }
         Object markersToAdd = methodCall.argument("markersToAdd");
-        addByList((List<Object>) markersToAdd);
+//        addByList((List<Object>) markersToAdd);
+        myAddByList((List<Object>) markersToAdd);
         Object markersToChange = methodCall.argument("markersToChange");
         updateByList((List<Object>) markersToChange);
         Object markerIdsToRemove = methodCall.argument("markerIdsToRemove");
@@ -84,6 +99,94 @@ public class MarkersController
         result.success(null);
     }
 
+
+    //自定义标记点 markersToAdd是flutter传入的所有标记点数组，内含坐标数据，image图片，以及气泡显示文字
+    public void myAddByList(List<Object> markersToAdd) {
+        if (markersToAdd != null) {
+            ArrayList<LatLng> posList = new ArrayList<>();
+            for (Object flutterMarker : markersToAdd) {
+                //单个添加：获取flutter中的标记点Id
+                String flutterMarkerId = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "id").toString();
+                if (!TextUtils.isEmpty(flutterMarkerId)) {
+                    ///图标数据
+                    Object icon = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "icon");
+//                    Log.d(icon.toString(), "myAddByList:111111111111 ");
+                    String iconString = icon.toString();
+
+                    ///文字信息数据
+                    Map<String, Object> infoWindow = (Map<String, Object>)ConvertUtil.getKeyValueFromMapObject(flutterMarker, "infoWindow");
+                    //电池
+                    String title = (String) infoWindow.get("title");
+                    //排队
+                    String snippet = (String) infoWindow.get("snippet");
+                    ///经纬度
+                    final Object positionObj = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "position");
+                    LatLng position = ConvertUtil.toLatLng(positionObj);
+                    posList.add(position);
+                    //样式
+                    View view = View.inflate(this.mContext, R.layout.layout_map, null);
+                    TextView tv_text1= view.findViewById(R.id.tv_text1);
+                    tv_text1.setText(title);
+                    TextView tv_text2= view.findViewById(R.id.tv_text2);
+                    tv_text2.setText(snippet);
+                    ImageView iv_icon = view.findViewById(R.id.iv_icon);
+                    if (iconString.contains("dtgreen")){
+                        iv_icon.setImageResource(R.mipmap.dtgreen);
+                    }else if (iconString.contains("dtred")){
+                        iv_icon.setImageResource(R.mipmap.dtred);
+                    }else if (iconString.contains("dtgray")){
+                        iv_icon.setImageResource(R.mipmap.dtgray);
+                    }else if (iconString.contains("dtyellow")){
+                        iv_icon.setImageResource(R.mipmap.dtyellow);
+                    }
+                    //将自定义的view转化成bitmap添加到标记点上
+                    BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromView(view);
+                    //初始化marker属性数据
+                    MarkerOptions markerOptions = new MarkerOptions().position(position) .draggable(false) .icon(markerIcon) .setFlat(true);
+                    //单个添加：marker
+                    Marker marker = amap.addMarker(markerOptions);
+                    marker.setClickable(true);
+                    marker.setInfoWindowEnable(false);//点击弹出气泡
+                    //将flutter中的markerId与地图中的markerId绑定一起
+                    MarkerController markerController = new MarkerController(marker);
+                    controllerMapByDartId.put(flutterMarkerId, markerController);
+                    idMapByOverlyId.put(marker.getId(), flutterMarkerId);
+                }
+            }
+            //移动显示区域
+            zoomToSpan(posList);
+        }
+    }
+
+//    //view 转bitmap
+//    private static Bitmap convertViewToBitmap(View view) {
+//        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+//        view.buildDrawingCache();
+//        Bitmap bitmap = view.getDrawingCache();
+//        return bitmap;
+//    }
+
+    //移动地图至所有标记点显示区域
+    public void zoomToSpan(ArrayList<LatLng> mPois) {
+        if (mPois != null && mPois.size() > 0) {
+            if (amap == null)
+                return;
+            LatLngBounds bounds = getLatLngBounds(mPois);
+            //四周边距200px = 100dp
+            amap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+        }
+    }
+    private LatLngBounds getLatLngBounds(ArrayList<LatLng> mPois) {
+        LatLngBounds.Builder b = LatLngBounds.builder();
+        for (int i = 0; i < mPois.size(); i++) {
+            b.include(new LatLng(mPois.get(i).latitude,
+                    mPois.get(i).longitude));
+        }
+        return b.build();
+    }
+
+    //markersToAdd是flutter传入的所有标记点数组，内含坐标数据，image图片，以及气泡显示文字
     public void addByList(List<Object> markersToAdd) {
         if (markersToAdd != null) {
             for (Object markerToAdd : markersToAdd) {
@@ -92,11 +195,13 @@ public class MarkersController
         }
     }
 
+    //markerObj内含坐标数据，image图片，以及气泡显示文字
     private void add(Object markerObj) {
         if (null != amap) {
             MarkerOptionsBuilder builder = new MarkerOptionsBuilder();
             String dartMarkerId = MarkerUtil.interpretMarkerOptions(markerObj, builder);
             if (!TextUtils.isEmpty(dartMarkerId)) {
+
                 MarkerOptions markerOptions = builder.build();
                 final Marker marker = amap.addMarker(markerOptions);
                 Object clickable = ConvertUtil.getKeyValueFromMapObject(markerObj, "clickable");
@@ -108,8 +213,8 @@ public class MarkersController
                 idMapByOverlyId.put(marker.getId(), dartMarkerId);
             }
         }
-
     }
+
 
     private void updateByList(List<Object> markersToChange) {
         if (markersToChange != null) {

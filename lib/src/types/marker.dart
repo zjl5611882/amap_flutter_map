@@ -60,7 +60,7 @@ class InfoWindow {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    if (other is !InfoWindow) {
+    if (other is! InfoWindow) {
       return false;
     }
     final InfoWindow typedOther = other;
@@ -143,6 +143,7 @@ class Marker extends BaseOverlay {
   /// 值越小，图层越靠下，iOS该值不支持动态修改,仅能在初始化时指定
   final double zIndex;
 
+
   /// 回调的参数是对应的id
   final ArgumentCallback<String>? onTap;
 
@@ -161,7 +162,7 @@ class Marker extends BaseOverlay {
     LatLng? positionParam,
     double? rotationParam,
     bool? visibleParam,
-    ArgumentCallback<String?> ? onTapParam,
+    ArgumentCallback<String?>? onTapParam,
     MarkerDragEndCallback? onDragEndParam,
   }) {
     Marker copyMark = Marker(
@@ -218,7 +219,7 @@ class Marker extends BaseOverlay {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    if(other is !Marker) return false;
+    if (other is! Marker) return false;
     final Marker typedOther = other;
     return id == typedOther.id &&
         alpha == typedOther.alpha &&
