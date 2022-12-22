@@ -27,6 +27,7 @@ import com.amap.flutter.map.overlays.AbstractOverlayController;
 import com.amap.flutter.map.utils.Const;
 import com.amap.flutter.map.utils.ConvertUtil;
 import com.amap.flutter.map.utils.LogUtil;
+import com.amap.flutter.map.utils.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,8 +35,11 @@ import java.util.List;
 import java.util.Map;
 
 
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
+
+
 
 /**
  * @author whm
@@ -56,7 +60,7 @@ public class MarkersController
 
     public MarkersController(MethodChannel methodChannel, AMap amap, Context context) {
         super(methodChannel, amap);
-        this.mContext=context;
+        this.mContext = context;
         amap.addOnMarkerClickListener(this);
         amap.addOnMarkerDragListener(this);
         amap.addOnMapClickListener(this);
@@ -108,41 +112,76 @@ public class MarkersController
                 //单个添加：获取flutter中的标记点Id
                 String flutterMarkerId = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "id").toString();
                 if (!TextUtils.isEmpty(flutterMarkerId)) {
-                    ///图标数据
-                    Object icon = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "icon");
-//                    Log.d(icon.toString(), "myAddByList:111111111111 ");
-                    String iconString = icon.toString();
-
-                    ///文字信息数据
-                    Map<String, Object> infoWindow = (Map<String, Object>)ConvertUtil.getKeyValueFromMapObject(flutterMarker, "infoWindow");
-                    //电池
-                    String title = (String) infoWindow.get("title");
-                    //排队
-                    String snippet = (String) infoWindow.get("snippet");
                     ///经纬度
                     final Object positionObj = ConvertUtil.getKeyValueFromMapObject(flutterMarker, "position");
                     LatLng position = ConvertUtil.toLatLng(positionObj);
                     posList.add(position);
-                    //样式
-                    View view = View.inflate(this.mContext, R.layout.layout_map, null);
-                    TextView tv_text1= view.findViewById(R.id.tv_text1);
-                    tv_text1.setText(title);
-                    TextView tv_text2= view.findViewById(R.id.tv_text2);
-                    tv_text2.setText(snippet);
-                    ImageView iv_icon = view.findViewById(R.id.iv_icon);
-                    if (iconString.contains("dtgreen")){
-                        iv_icon.setImageResource(R.mipmap.dtgreen);
-                    }else if (iconString.contains("dtred")){
-                        iv_icon.setImageResource(R.mipmap.dtred);
-                    }else if (iconString.contains("dtgray")){
-                        iv_icon.setImageResource(R.mipmap.dtgray);
-                    }else if (iconString.contains("dtyellow")){
-                        iv_icon.setImageResource(R.mipmap.dtyellow);
+
+                    ///文字信息数据
+                    Map<String, Object> infoWindow = (Map<String, Object>) ConvertUtil.getKeyValueFromMapObject(flutterMarker, "infoWindow");
+                    //传输的数据
+                    String jsonString = (String) infoWindow.get("title");
+                    //type： 0换电地图 1充电地图
+                    //num：type=0时，电池数量，type=1时，可用充电枪数量
+                    //desc：type=0时，排队人数，type=1时，当前价格
+                    //imageString：图片名称
+                    Map infoData = JsonUtil.jsonToMap(jsonString);
+                    //换电地图标记点样式
+                    View view;
+                    String type = (String) infoData.get("type");
+                    int i =  Integer.parseInt(type);
+                    String num = (String) infoData.get("num");
+                    String desc = (String) infoData.get("desc");
+                    String imageString = (String) infoData.get("imageString");
+                    if (i == 0){
+                        LogUtil.i(CLASS_NAME,"0000000000换电地图"+infoData);
+                        view = View.inflate(this.mContext, R.layout.layout_hd_map, null);
+
+                        ImageView iv_icon = view.findViewById(R.id.tv_hd_icon);
+                        if (imageString.equals("dthdgreen")){
+                            iv_icon.setImageResource(R.mipmap.dthdgreen);
+                        }else if (imageString.equals("dthdred")){
+                            iv_icon.setImageResource(R.mipmap.dthdred);
+                        }else if (imageString.equals("dthdgray")){
+                            iv_icon.setImageResource(R.mipmap.dthdgray);
+                        }else if (imageString.equals("dthdyellow")){
+                            iv_icon.setImageResource(R.mipmap.dthdyellow);
+                        }else {
+                            iv_icon.setImageResource(R.mipmap.dthdgreen);
+                        }
+                        //排队人数
+                        TextView tv_line = view.findViewById(R.id.tv_line);
+                        tv_line.setText(desc);
+                        //电池数量
+                        TextView tv_power = view.findViewById(R.id.tv_power);
+                        tv_power.setText(num);
+                    }else {
+                        LogUtil.i(CLASS_NAME,"1111111111充电地图"+infoData);
+                        view = View.inflate(this.mContext, R.layout.layout_cd_map, null);
+                        ImageView iv_icon = view.findViewById(R.id.tv_cd_icon);
+                        if (imageString.equals("dtcdred")){
+                            iv_icon.setImageResource(R.mipmap.dtcdred);
+                        }else if (imageString.equals("dtcdgreen")){
+                            iv_icon.setImageResource(R.mipmap.dtcdgreen);
+                        }else {
+                            iv_icon.setImageResource(R.mipmap.dtcdgreen);
+                        }
+                        //充电价格
+                        TextView tv_price = view.findViewById(R.id.tv_price);
+                        tv_price.setText(desc);
+                        LogUtil.i(CLASS_NAME,"1111111111充电价格"+desc);
+                        //充电枪数量
+                        TextView tv_num = view.findViewById(R.id.tv_num);
+                        tv_num.setText(num);
+                        LogUtil.i(CLASS_NAME,"1111111111充电枪"+num);
                     }
+                    
+
+
                     //将自定义的view转化成bitmap添加到标记点上
                     BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromView(view);
                     //初始化marker属性数据
-                    MarkerOptions markerOptions = new MarkerOptions().position(position) .draggable(false) .icon(markerIcon) .setFlat(true);
+                    MarkerOptions markerOptions = new MarkerOptions().position(position).draggable(false).icon(markerIcon).setFlat(true);
                     //单个添加：marker
                     Marker marker = amap.addMarker(markerOptions);
                     marker.setClickable(true);
@@ -158,6 +197,7 @@ public class MarkersController
         }
     }
 
+
 //    //view 转bitmap
 //    private static Bitmap convertViewToBitmap(View view) {
 //        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -166,7 +206,6 @@ public class MarkersController
 //        Bitmap bitmap = view.getDrawingCache();
 //        return bitmap;
 //    }
-
     //移动地图至所有标记点显示区域
     public void zoomToSpan(ArrayList<LatLng> mPois) {
         if (mPois != null && mPois.size() > 0) {
@@ -177,6 +216,7 @@ public class MarkersController
             amap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
         }
     }
+
     private LatLngBounds getLatLngBounds(ArrayList<LatLng> mPois) {
         LatLngBounds.Builder b = LatLngBounds.builder();
         for (int i = 0; i < mPois.size(); i++) {
@@ -214,7 +254,6 @@ public class MarkersController
             }
         }
     }
-
 
     private void updateByList(List<Object> markersToChange) {
         if (markersToChange != null) {

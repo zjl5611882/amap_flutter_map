@@ -27,7 +27,8 @@
 #import "AMapConvertUtil.h"
 #import "FlutterMethodChannel+MethodCallDispatch.h"
 
-#import "MAInfowindowView.h"
+#import "ReplaceMarkerView.h"
+#import "ChargeMarkerView.h"
 #import "AMapInfoWindow.h"
 #import "AMapMarker.h"
 @interface AMapViewController ()<MAMapViewDelegate>
@@ -328,19 +329,43 @@
         return nil;
     }
     AMapMarker *marker = [_markerController markerForId:fAnno.markerId];
-    
     ///flutter 自定义--->
-   static NSString *poiIdentifier = @"poiIdentifier";
-   MAInfowindowView *poiAnnotationView = (MAInfowindowView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:poiIdentifier];
-   if (poiAnnotationView == nil)
-   {
-       poiAnnotationView = [[MAInfowindowView alloc] initWithAnnotation:annotation reuseIdentifier:poiIdentifier];
-
-       // 屏蔽默认的calloutView
-       poiAnnotationView.canShowCallout = NO;
-   }
-   poiAnnotationView.marker = marker;
-   return poiAnnotationView;
+    NSString *jsonString = marker.infoWindow.title;
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    //type： 0换电地图 1充电地图
+    //num：type=0时，电池数量，type=1时，可用充电枪数量
+    //desc：type=0时，排队人数，type=1时，当前价格
+    //imageString：图片名称
+    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
+    NSLog(@"----------标记点数据 = %@",data);
+    if ([[NSString stringWithFormat:@"%@",data[@"type"]] isEqualToString:@"0"]){
+        static NSString *poiIdentifier = @"ReplacePoiIdentifier";
+        ReplaceMarkerView *poiAnnotationView = (ReplaceMarkerView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:poiIdentifier];
+        if (poiAnnotationView == nil)
+        {
+            poiAnnotationView = [[ReplaceMarkerView alloc] initWithAnnotation:annotation reuseIdentifier:poiIdentifier];
+            
+            // 屏蔽默认的calloutView
+            poiAnnotationView.canShowCallout = NO;
+        }
+        poiAnnotationView.markerData = data;
+        return poiAnnotationView;
+    }else{
+        static NSString *poiIdentifier = @"ChargePoiIdentifier";
+        ChargeMarkerView *poiAnnotationView = (ChargeMarkerView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:poiIdentifier];
+        if (poiAnnotationView == nil)
+        {
+            poiAnnotationView = [[ChargeMarkerView alloc] initWithAnnotation:annotation reuseIdentifier:poiIdentifier];
+            
+            // 屏蔽默认的calloutView
+            poiAnnotationView.canShowCallout = NO;
+        }
+        poiAnnotationView.markerData = data;
+        return poiAnnotationView;
+    }
+    
+   
     ///<---flutter 自定义
     
 
