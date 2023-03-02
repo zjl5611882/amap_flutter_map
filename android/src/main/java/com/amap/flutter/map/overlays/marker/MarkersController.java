@@ -138,16 +138,16 @@ public class MarkersController
                         view = View.inflate(this.mContext, R.layout.layout_hd_map, null);
 
                         ImageView iv_icon = view.findViewById(R.id.tv_hd_icon);
-                        if (imageString.equals("dthdgreen")){
-                            iv_icon.setImageResource(R.mipmap.dthdgreen);
-                        }else if (imageString.equals("dthdred")){
-                            iv_icon.setImageResource(R.mipmap.dthdred);
-                        }else if (imageString.equals("dthdgray")){
-                            iv_icon.setImageResource(R.mipmap.dthdgray);
-                        }else if (imageString.equals("dthdyellow")){
-                            iv_icon.setImageResource(R.mipmap.dthdyellow);
+                        if (imageString.equals("dthdyy")){
+                            iv_icon.setImageResource(R.mipmap.dthdyy);
+                        }else if (imageString.equals("dthdty")){
+                            iv_icon.setImageResource(R.mipmap.dthdty);
+                        }else if (imageString.equals("dthdjsz")){
+                            iv_icon.setImageResource(R.mipmap.dthdjsz);
+                        }else if (imageString.equals("dthdwh")){
+                            iv_icon.setImageResource(R.mipmap.dthdwh);
                         }else {
-                            iv_icon.setImageResource(R.mipmap.dthdgreen);
+                            iv_icon.setImageResource(R.mipmap.dthdyy);
                         }
                         //排队人数
                         TextView tv_line = view.findViewById(R.id.tv_line);
@@ -159,12 +159,16 @@ public class MarkersController
                         LogUtil.i(CLASS_NAME,"1111111111充电地图"+infoData);
                         view = View.inflate(this.mContext, R.layout.layout_cd_map, null);
                         ImageView iv_icon = view.findViewById(R.id.tv_cd_icon);
-                        if (imageString.equals("dtcdred")){
-                            iv_icon.setImageResource(R.mipmap.dtcdred);
-                        }else if (imageString.equals("dtcdgreen")){
-                            iv_icon.setImageResource(R.mipmap.dtcdgreen);
+                        if (imageString.equals("dtcdty")){
+                            iv_icon.setImageResource(R.mipmap.dtcdty);
+                        }else if (imageString.equals("dtcdyy")){
+                            iv_icon.setImageResource(R.mipmap.dtcdyy);
+                        }else if (imageString.equals("dtcdjsz")){
+                            iv_icon.setImageResource(R.mipmap.dtcdjsz);
+                        }else if (imageString.equals("dtcdwh")){
+                            iv_icon.setImageResource(R.mipmap.dtcdwh);
                         }else {
-                            iv_icon.setImageResource(R.mipmap.dtcdgreen);
+                            iv_icon.setImageResource(R.mipmap.dtcdyy);
                         }
                         //充电价格
                         TextView tv_price = view.findViewById(R.id.tv_price);

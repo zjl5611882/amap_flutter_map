@@ -324,7 +324,7 @@
     if ([annotation isKindOfClass:[MAPointAnnotation class]] == NO) {
         return nil;
     }
-    MAPointAnnotation *fAnno = annotation;
+    MAPointAnnotation *fAnno = (MAPointAnnotation *)annotation;
     if (fAnno.markerId == nil) {
         return nil;
     }
@@ -393,7 +393,7 @@
         if ([view.annotation isKindOfClass:[MAAnnotationView class]] == NO) {
             return;
         }
-        MAPointAnnotation *fAnno = view.annotation;
+        MAPointAnnotation *fAnno = (MAPointAnnotation *)view.annotation;
         if (fAnno.markerId == nil) {
             return;
         }
