@@ -2,6 +2,7 @@ package com.amap.flutter.map.core;
 
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Bundle;
 
 
 import androidx.annotation.NonNull;
@@ -282,6 +283,15 @@ public class MapController
             arguments.put("location", ConvertUtil.location2Map(location));
             methodChannel.invokeMethod("location#changed", arguments);
             LogUtil.i(CLASS_NAME, "onMyLocationChange===>" + arguments);
+            //可自定义地图蓝点，修改定位蓝点漂移
+//            Bundle bundle = location.getExtras();
+//            if (bundle != null){
+//                //定位类型 ，可能为GPS,WIFI
+//                int locationType = bundle.getInt(MyLocationStyle.LOCATION_TYPE);
+//                if (locationType == 6){
+//
+//                }
+//            }
         }
     }
 

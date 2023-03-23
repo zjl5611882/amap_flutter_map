@@ -73,8 +73,11 @@
     }
     if (markers.count>0) {
         [self.mapView addAnnotations:markers];
-        ///显示全部地图上的点---flutter需求
-        NSLog(@"markersmarkers == %@",markers);
+        NSLog(@"markers == %@",markers);
+        // ///显示全部地图上的点包括自身定位---flutter需求
+        // MAPointAnnotation *userMarker = _mapView.userLocation;
+        // [markers addObject:userMarker];
+        // NSLog(@"markersAndUser == %@",markers);
        [self.mapView showAnnotations:markers edgePadding:UIEdgeInsetsMake(50, 50, 50, 50) animated:YES];
     }
 }

@@ -91,6 +91,8 @@
         if (_mapView == nil && (MAMapVersionNumber) >= 80100) {
             NSAssert(_mapView,@"MAMapView初始化失败，地图SDK8.1.0及以上，请务必确保调用SDK任何接口前先调用更新隐私合规updatePrivacyShow:privacyInfo、updatePrivacyAgree两个接口");
         }
+        ///设置定位精度-----
+//        _mapView.desiredAccuracy = 200;
         _mapView.delegate = self;
         _mapView.accessibilityElementsHidden = NO;
         [_mapView setCameraPosition:cameraPosition animated:NO duration:0];
@@ -270,6 +272,7 @@
  * @param updatingLocation 标示是否是location数据更新, YES:location数据更新 NO:heading数据更新
  */
 - (void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation {
+    NSLog(@"地图位置更新lat = %f,lng = %f",userLocation.location.coordinate.latitude,userLocation.location.coordinate.longitude);
     if (updatingLocation && userLocation.location) {
         AMapLocation *location = [[AMapLocation alloc] init];
         [location updateWithUserLocation:userLocation.location];

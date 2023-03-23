@@ -2,6 +2,7 @@ package com.amap.flutter.map.overlays.marker;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
+import com.amap.api.maps.model.LatLngCreator;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.Poi;
@@ -106,7 +108,8 @@ public class MarkersController
 
     //自定义标记点 markersToAdd是flutter传入的所有标记点数组，内含坐标数据，image图片，以及气泡显示文字
     public void myAddByList(List<Object> markersToAdd) {
-        if (markersToAdd != null) {
+        LogUtil.i(CLASS_NAME, "markersToAdd==>" + markersToAdd);
+        if (markersToAdd != null && !markersToAdd.isEmpty()) {
             ArrayList<LatLng> posList = new ArrayList<>();
             for (Object flutterMarker : markersToAdd) {
                 //单个添加：获取flutter中的标记点Id
@@ -196,7 +199,15 @@ public class MarkersController
                     idMapByOverlyId.put(marker.getId(), flutterMarkerId);
                 }
             }
-            //移动显示区域
+            //移动显示区域,包括自身定位点
+            //  Location userLocation = amap.getMyLocation();
+            //  if (userLocation != null){
+            //    double userLat = userLocation.getLatitude();
+            //    double userLng = userLocation.getLongitude();
+            //    LatLng user = new LatLng(userLat,userLng);
+            //    posList.add(user);
+            //  }
+            // LogUtil.i(CLASS_NAME, "posList==>" + posList + userLocation);
             zoomToSpan(posList);
         }
     }
