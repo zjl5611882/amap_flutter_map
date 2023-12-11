@@ -200,14 +200,14 @@ public class MarkersController
                 }
             }
             //移动显示区域,包括自身定位点
-            //  Location userLocation = amap.getMyLocation();
-            //  if (userLocation != null){
-            //    double userLat = userLocation.getLatitude();
-            //    double userLng = userLocation.getLongitude();
-            //    LatLng user = new LatLng(userLat,userLng);
-            //    posList.add(user);
-            //  }
-            // LogUtil.i(CLASS_NAME, "posList==>" + posList + userLocation);
+             Location userLocation = amap.getMyLocation();
+             if (userLocation != null){
+               double userLat = userLocation.getLatitude();
+               double userLng = userLocation.getLongitude();
+               LatLng user = new LatLng(userLat,userLng);
+               posList.add(user);
+             }
+            LogUtil.i(CLASS_NAME, "posList==>" + posList + userLocation);
             zoomToSpan(posList);
         }
     }
