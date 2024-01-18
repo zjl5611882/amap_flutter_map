@@ -60,7 +60,7 @@ class Toast {
     _pdHorizontal = pdHorizontal;
     _pdVertical = pdVertical;
     //获取OverlayState
-    OverlayState overlayState = Overlay.of(context)!;
+    OverlayState overlayState = Overlay.of(context);
     _showing = true;
     if (_overlayEntry == null) {
       //OverlayEntry负责构建布局

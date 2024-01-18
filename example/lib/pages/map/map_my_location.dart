@@ -4,6 +4,7 @@ import 'package:amap_flutter_map_example/const_config.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+
 class MyLocationPage extends BasePage {
   MyLocationPage(String title, String subTitle) : super(title, subTitle);
   @override
