@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+
 
 import 'package:amap_flutter_base/amap_flutter_base.dart';
 import 'package:amap_flutter_map_example/base_page.dart';

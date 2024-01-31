@@ -3,7 +3,6 @@ import 'dart:ui' show hashValues;
 import 'package:flutter/foundation.dart' show setEquals;
 
 import 'types.dart';
-import 'marker.dart';
 
 /// 用以描述Marker的更新项
 class MarkerUpdates {

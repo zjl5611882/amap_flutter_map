@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:amap_flutter_map_example/base_page.dart';
 import 'package:amap_flutter_map_example/const_config.dart';
 import 'package:amap_flutter_map_example/widgets/amap_switch_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 
 import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:amap_flutter_base/amap_flutter_base.dart';
@@ -37,40 +35,40 @@ class _State extends State<_Body> {
 
   void _onMapCreated(AMapController controller) {}
 
-  ///通过BitmapDescriptor.fromAssetImage的方式获取图片
-  Future<void> _createMarkerImageFromAsset(BuildContext context) async {
-    if (_markerIcon == null) {
-      final ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
-      BitmapDescriptor.fromAssetImage(imageConfiguration, 'assets/start.png')
-          .then(_updateBitmap);
-    }
-  }
+  // ///通过BitmapDescriptor.fromAssetImage的方式获取图片
+  // Future<void> _createMarkerImageFromAsset(BuildContext context) async {
+  //   if (_markerIcon == null) {
+  //     final ImageConfiguration imageConfiguration =
+  //         createLocalImageConfiguration(context);
+  //     BitmapDescriptor.fromAssetImage(imageConfiguration, 'assets/start.png')
+  //         .then(_updateBitmap);
+  //   }
+  // }
 
-  ///通过BitmapDescriptor.fromBytes的方式获取图片
-  Future<void> _createMarkerImageFromBytes(BuildContext context) async {
-    final Completer<BitmapDescriptor> bitmapIcon =
-        Completer<BitmapDescriptor>();
-    final ImageConfiguration config = createLocalImageConfiguration(context);
+  // ///通过BitmapDescriptor.fromBytes的方式获取图片
+  // Future<void> _createMarkerImageFromBytes(BuildContext context) async {
+  //   final Completer<BitmapDescriptor> bitmapIcon =
+  //       Completer<BitmapDescriptor>();
+  //   final ImageConfiguration config = createLocalImageConfiguration(context);
 
-    const AssetImage('assets/end.png')
-        .resolve(config)
-        .addListener(ImageStreamListener((ImageInfo image, bool sync) async {
-      final ByteData bytes =
-          (await image.image.toByteData(format: ImageByteFormat.png))!;
-      final BitmapDescriptor bitmap =
-          BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
-      bitmapIcon.complete(bitmap);
-    }));
+  //   const AssetImage('assets/end.png')
+  //       .resolve(config)
+  //       .addListener(ImageStreamListener((ImageInfo image, bool sync) async {
+  //     final ByteData bytes =
+  //         (await image.image.toByteData(format: ImageByteFormat.png))!;
+  //     final BitmapDescriptor bitmap =
+  //         BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
+  //     bitmapIcon.complete(bitmap);
+  //   }));
 
-    bitmapIcon.future.then((value) => _updateBitmap(value));
-  }
+  //   bitmapIcon.future.then((value) => _updateBitmap(value));
+  // }
 
-  void _updateBitmap(BitmapDescriptor bitmap) {
-    setState(() {
-      _markerIcon = bitmap;
-    });
-  }
+  // void _updateBitmap(BitmapDescriptor bitmap) {
+  //   setState(() {
+  //     _markerIcon = bitmap;
+  //   });
+  // }
 
   void _add() {
     final int markerCount = _markers.length;
