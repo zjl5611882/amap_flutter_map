@@ -32,6 +32,7 @@
 //type： 0换电地图 1充电地图
 //num：type=0时，电池数量，type=1时，可用充电枪数量
 //desc：type=0时，排队人数，type=1时，当前价格
+//value：type=0时，排队：0 | 电池：0   type=1时，￥0.0/度
 //imageString：图片名称
 - (void)setMarkerData:(NSDictionary *)markerData{
     _markerData = markerData;
@@ -42,12 +43,25 @@
     self.sImageView.image = image;
     self.sImageView.frame = CGRectMake((kWidth - kImageWidth)/2, kHeight - kImageHeight, kImageWidth, kImageHeight);
     
-    NSString *titleString = [NSString stringWithFormat:@"排队:%@ | 电池:%@",markerData[@"desc"],markerData[@"num"]];
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:titleString];
-    NSRange range1 = [titleString rangeOfString:@"排队:"];
-    [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:8] range:range1];
-    NSRange range2 = [titleString rangeOfString:@"电池:"];
-    [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:8] range:range2];
+    NSString *value = [NSString stringWithFormat:@"%@",markerData[@"value"]];
+    NSString *desc = [NSString stringWithFormat:@"%@",markerData[@"desc"]];
+    NSString *num = [NSString stringWithFormat:@"%@",markerData[@"num"]];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:value];
+    if ([desc isEqualToString: num]) {
+        NSRange range1 = [value rangeOfString:desc];
+        // 从第一个0之后开始查找最后一个0的范围
+        NSRange searchRange = NSMakeRange(range1.location + 1, [value length] - range1.location - 1);
+        NSRange range2 = [value rangeOfString:num options:NSBackwardsSearch range:searchRange];
+        [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:range1];
+    
+        [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:range2];
+    }else{
+        NSRange range1 = [value rangeOfString:desc];
+        [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:range1];
+        NSRange range2 = [value rangeOfString:num];
+        [attributedString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:range2];
+    }
+    
     self.descLabel.attributedText = attributedString;
     self.descLabel.frame = CGRectMake(0, 0, kWidth, ktopHeight);
 }
@@ -72,7 +86,7 @@
         self.descLabel.backgroundColor = [UIColor whiteColor];
         self.descLabel.layer.cornerRadius = ktopHeight/2;
         self.descLabel.layer.masksToBounds = YES;
-        self.descLabel.font = [UIFont systemFontOfSize:12];
+        self.descLabel.font = [UIFont systemFontOfSize:8];
         self.descLabel.textAlignment = NSTextAlignmentCenter;
         self.descLabel.textColor = [UIColor blackColor];
         [self addSubview:self.descLabel];

@@ -30,8 +30,9 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 
-import io.flutter.view.FlutterMain;
-
+import io.flutter.FlutterInjector;
+//import io.flutter.view.FlutterMain;
+import io.flutter.embedding.engine.loader.FlutterLoader;
 /**
  * @author whm
  * @date 2020/10/29 11:01 AM
@@ -373,15 +374,18 @@ public class ConvertUtil {
             case "fromAsset":
                 if (data.size() == 2) {
                     return BitmapDescriptorFactory.fromAsset(
-                            FlutterMain.getLookupKeyForAsset(toString(data.get(1))));
+//                            FlutterMain.getLookupKeyForAsset(toString(data.get(1))));
+                    FlutterInjector.instance().flutterLoader().getLookupKeyForAsset(toString(data.get(1))));
                 } else {
                     return BitmapDescriptorFactory.fromAsset(
-                            FlutterMain.getLookupKeyForAsset(toString(data.get(1)), toString(data.get(2))));
+                            FlutterInjector.instance().flutterLoader().getLookupKeyForAsset(toString(data.get(1)), toString(data.get(2))));
+//                            FlutterMain.getLookupKeyForAsset(toString(data.get(1)), toString(data.get(2))));
                 }
             case "fromAssetImage":
                 if (data.size() == 3) {
                     return BitmapDescriptorFactory.fromAsset(
-                            FlutterMain.getLookupKeyForAsset(toString(data.get(1))));
+                            FlutterInjector.instance().flutterLoader().getLookupKeyForAsset(toString(data.get(1))));
+//                            FlutterMain.getLookupKeyForAsset(toString(data.get(1))));
                 } else {
                     throw new IllegalArgumentException(
                             "'fromAssetImage' Expected exactly 3 arguments, got: " + data.size());

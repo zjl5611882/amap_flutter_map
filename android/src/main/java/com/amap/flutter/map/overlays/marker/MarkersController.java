@@ -8,6 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+
+
 
 import androidx.annotation.NonNull;
 
@@ -127,6 +132,7 @@ public class MarkersController
                     //type： 0换电地图 1充电地图
                     //num：type=0时，电池数量，type=1时，可用充电枪数量
                     //desc：type=0时，排队人数，type=1时，当前价格
+                    //value：type=0时，排队：0 | 电池：0   type=1时，￥0.0/度
                     //imageString：图片名称
                     Map infoData = JsonUtil.jsonToMap(jsonString);
                     //换电地图标记点样式
@@ -135,10 +141,44 @@ public class MarkersController
                     int i =  Integer.parseInt(type);
                     String num = (String) infoData.get("num");
                     String desc = (String) infoData.get("desc");
+                    String value = (String) infoData.get("value");
                     String imageString = (String) infoData.get("imageString");
                     if (i == 0){
                         LogUtil.i(CLASS_NAME,"0000000000换电地图"+infoData);
                         view = View.inflate(this.mContext, R.layout.layout_hd_map, null);
+
+                        // 构建带有不同字号的文本
+                        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(value);
+                        // 查找 num 在 value 中的位置
+                        int numStart = value.indexOf(num);
+                        int numEnd = numStart + num.length();
+                        LogUtil.i(CLASS_NAME,"----------------  numStart"+numStart);
+                        LogUtil.i(CLASS_NAME,"----------------  numEnd"+numEnd);
+                        // 设置 num 的字号12
+                        spannableStringBuilder.setSpan(new AbsoluteSizeSpan(12, true), numStart, numEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        // 查找 desc 在 value 中的位置
+                        int descStart = value.indexOf(desc);
+                        if (num.equals(desc)){
+                            descStart = value.indexOf(desc,numEnd);
+                        }
+                        int descEnd = descStart + desc.length();
+                        LogUtil.i(CLASS_NAME,"----------------  descStart"+descStart);
+                        LogUtil.i(CLASS_NAME,"----------------  descEnd"+descEnd);
+                        // 设置 desc 的字号12
+                        spannableStringBuilder.setSpan(new AbsoluteSizeSpan(12, true), descStart, descEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        TextView tv_content = view.findViewById(R.id.tv_content);
+                        tv_content.setText(spannableStringBuilder);
+
+
+                        // //排队人数
+                        // TextView tv_line = view.findViewById(R.id.tv_line);
+                        // tv_line.setText(desc);
+                        // //电池数量
+                        // TextView tv_power = view.findViewById(R.id.tv_power);
+                        // tv_power.setText(num);
+
+
 
                         ImageView iv_icon = view.findViewById(R.id.tv_hd_icon);
                         if (imageString.equals("dthdyy")){
@@ -152,12 +192,7 @@ public class MarkersController
                         }else {
                             iv_icon.setImageResource(R.mipmap.dthdyy);
                         }
-                        //排队人数
-                        TextView tv_line = view.findViewById(R.id.tv_line);
-                        tv_line.setText(desc);
-                        //电池数量
-                        TextView tv_power = view.findViewById(R.id.tv_power);
-                        tv_power.setText(num);
+
                     }else {
                         LogUtil.i(CLASS_NAME,"1111111111充电地图"+infoData);
                         view = View.inflate(this.mContext, R.layout.layout_cd_map, null);
@@ -173,10 +208,21 @@ public class MarkersController
                         }else {
                             iv_icon.setImageResource(R.mipmap.dtcdyy);
                         }
+                        // LogUtil.i(CLASS_NAME,"1111111111充电信息"+value);
+                        // 构建带有不同字号的文本
+                        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(value);
+
+                        // 查找 desc 在 value 中的位置
+                        int start = value.indexOf(desc);
+                        int end = start + desc.length();
+
+                        // 设置desc的字号为 12
+                        spannableStringBuilder.setSpan(new AbsoluteSizeSpan(12, true), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                         //充电价格
                         TextView tv_price = view.findViewById(R.id.tv_price);
-                        tv_price.setText(desc);
-                        LogUtil.i(CLASS_NAME,"1111111111充电价格"+desc);
+                        tv_price.setText(spannableStringBuilder);
+                        LogUtil.i(CLASS_NAME,"1111111111充电价格"+spannableStringBuilder);
                         //充电枪数量
                         TextView tv_num = view.findViewById(R.id.tv_num);
                         tv_num.setText(num);
