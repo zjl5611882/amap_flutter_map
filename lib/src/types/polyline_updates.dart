@@ -6,7 +6,6 @@ import 'dart:ui' show hashValues;
 
 import 'package:flutter/foundation.dart' show setEquals;
 
-import 'polyline.dart';
 import 'types.dart';
 
 /// 该类主要用以描述[Polyline]的增删改等更新操作
